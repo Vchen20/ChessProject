@@ -1,5 +1,6 @@
 package com.example.chessproject
 
+import android.widget.Toast
 import kotlin.math.abs
 
 object ChessGame {
@@ -23,13 +24,14 @@ object ChessGame {
     }
 
     fun canMove(from: Square, to: Square):Boolean {
-        if(from.col == to.col && from.row == to.row) return false
+        if(from.col == to.col && from.row == to.row)
+            return false
         val movingPiece = pieceAt(from)?: return false
         when(movingPiece.types) {
             //Types.KING -> return canKingMove(from, to)
-            //Types.QUEEN -> return canQueenMove(from, to)
+            Types.QUEEN -> return canQueenMove(from, to)
             Types.ROOK -> return canRookMove(from, to)
-            //Types.BISHOP -> return canBishopMove(from, to)
+            Types.BISHOP -> return canBishopMove(from, to)
             Types.KNIGHT -> return canKnightMove(from, to)
             //Types.PAWN -> return canPawnMove(from, to)
         }
@@ -48,8 +50,11 @@ object ChessGame {
             }
             chessArray.remove(it)
         }
-        chessArray.remove(movingPiece)
-        chessArray.add(Piece(toCol, toRow, movingPiece.player, movingPiece.types, movingPiece.resID))
+        if(canMove(Square(fromCol,fromRow), Square(toCol, toRow)))
+        {
+            chessArray.remove(movingPiece)
+            chessArray.add(Piece(toCol, toRow, movingPiece.player, movingPiece.types, movingPiece.resID))
+        }
     }
 
         fun reset() {
@@ -153,12 +158,38 @@ object ChessGame {
     }
 
     fun canRookMove(from: Square, to: Square): Boolean {
-        if(from.col == to.col || from.row == to.row && isClearHorizontally(from, to))
+        if(from.col == to.col && isClearVertically(from, to)
+            || from.row == to.row && isClearHorizontally(from, to))
         {
             return true
         }
         return false
     }
+
+    private fun canBishopMove(from: Square, to: Square): Boolean {
+        if (abs(from.col - to.col) == abs(from.row - to.row)) {
+            return isClearDiagonally(from, to)
+        }
+        return false
+    }
+
+    private fun canQueenMove(from: Square, to: Square) : Boolean {
+        if(canBishopMove(from, to) || canRookMove(from, to)){
+            return true
+        }
+        return false
+    }
+/*
+    private fun canPawnMove(from: Square, to: Square) : Boolean {
+        if (from.col == to.col) {
+            if (from.row == 1) {
+                return to.row == 2 || to.row == 3
+            } else if (from.row == 6) {
+                return to.row == 5 || to.row == 4
+            }
+        }
+        return false
+    } */
 
     //Blocking Pieces
     private fun isClearHorizontally(from: Square, to: Square): Boolean{
@@ -174,16 +205,33 @@ object ChessGame {
         }
         return true
     }
-/*
-    private fun isClearVertically(from: Square, to: Square): Boolean{
-        if(from.col != to.row) return false
-        var space = abs(from.row - to.row) - 1
-        if(space == 0) return true
-        for(i in 1..space)
-            val nextRow = if (to.col > from.col) from.col + i else from.col - i
-        if(pieceAt(Square(from.col, nextRow)) != null) {
-            return false
+
+    private fun isClearVertically(from: Square, to: Square): Boolean {
+        if (from.col != to.col) return false
+        val gap = abs(from.row - to.row) - 1
+        if (gap == 0 ) return true
+        for (i in 1..gap) {
+            val nextRow = if (to.row > from.row) from.row + i else from.row - i
+            if (pieceAt(Square(from.col, nextRow)) != null) {
+                return false
+            }
         }
         return true
-    } */
+    }
+
+    private fun isClearDiagonally(from: Square, to: Square): Boolean {
+        if (abs(from.col - to.col) != abs(from.row - to.row)) return false
+        val gap = abs(from.col - to.col) - 1
+        for (i in 1..gap) {
+            val nextCol = if (to.col > from.col) from.col + i else from.col - i
+            val nextRow = if (to.row > from.row) from.row + i else from.row - i
+            if (pieceAt(nextCol, nextRow) != null) {
+                return false
+            }
+        }
+        return true
+    }
+
+
+
 }

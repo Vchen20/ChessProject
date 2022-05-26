@@ -10,7 +10,6 @@ import android.view.MotionEvent
 import kotlin.math.min
 
 class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
-
     private val originX = 20f
     private val originY = 200f
     private val cellSide: Float = 175f
@@ -34,7 +33,7 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         R.drawable.pawn_black
     )
 
-    private var movingPiece: Piece? = null
+    var movingPiece: Piece? = null
     private var movingPieceBitmap: Bitmap?= null
     private var fromCol  = -1
     private var fromRow = -1
