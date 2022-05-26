@@ -33,7 +33,7 @@ object ChessGame {
             Types.ROOK -> return canRookMove(from, to)
             Types.BISHOP -> return canBishopMove(from, to)
             Types.KNIGHT -> return canKnightMove(from, to)
-            //Types.PAWN -> return canPawnMove(from, to)
+            Types.PAWN -> return canPawnMove(from, to)
         }
         return true
     }
@@ -179,17 +179,37 @@ object ChessGame {
         }
         return false
     }
-/*
+
     private fun canPawnMove(from: Square, to: Square) : Boolean {
-        if (from.col == to.col) {
-            if (from.row == 1) {
-                return to.row == 2 || to.row == 3
-            } else if (from.row == 6) {
-                return to.row == 5 || to.row == 4
+        var space = abs(from.row - to.row)
+        if(canPawnCapture(from, to)) return true
+        if (pieceAt(from)?.player == Player.WHITE) {
+            if(from.col == to.col)
+            {
+                if(from.row == 1)
+                {
+                    return to.row == 2 || to.row == 3
+                }
+                else if(to.row > from.row && space == 1)
+                {
+                    return true
+                }
+            }
+        }
+        if (pieceAt(from)?.player == Player.BLACK) {
+            if(from.col == to.col)
+            {
+                if(from.row == 6)
+                {
+                    return to.row == 5 || to.row == 4
+                }
+                else if(space == 1 && to.row < from.row){
+                    return true
+                }
             }
         }
         return false
-    } */
+    }
 
     //Blocking Pieces
     private fun isClearHorizontally(from: Square, to: Square): Boolean{
@@ -232,6 +252,15 @@ object ChessGame {
         return true
     }
 
-
-
+    private fun canPawnCapture(from: Square, to: Square) : Boolean {
+        if(pieceAt(from)?.player == Player.WHITE)
+        {
+            if(from.col == to.col - 1 && from.row == to.row - 1 && pieceAt(to.col, to.row) != null) return true
+        }
+        if(pieceAt(from)?.player == Player.BLACK)
+        {
+            if(from.col == to.col + 1 && from.row == to.row + 1 && pieceAt(to.col, to.row) != null) return true
+        }
+        return false
+    }
 }
